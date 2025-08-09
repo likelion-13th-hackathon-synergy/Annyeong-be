@@ -1,0 +1,36 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+*.log
+
+# Django
+db.sqlite3
+media/
+staticfiles/
+
+# 환경 변수 & 설정
+.env
+*.secret
+*.key
+
+# 가상 환경
+venv/
+env/
+.venv/
+
+# IDE & OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Cache & Coverage
+*.coverage
+*.pytest_cache/
