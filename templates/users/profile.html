@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block title %}프로필{% endblock %}
+{% block content %}
+<h2>{{ user.real_name }}님의 프로필
+  {% if user.google_verified %}
+    <span title="본인확인됨" style="font-size:.8rem;padding:2px 6px;border-radius:10px;background:#e6ffed;border:1px solid #b7eb8f;margin-left:6px;">
+      ✅ 인증
+    </span>
+  {% endif %}
+</h2>
+<ul>
+    <li>아이디: {{ user.username }}</li>
+    <li>이메일: {{ user.email }}</li>
+    <li>사용자 구분: {{ user.get_user_type_display }}</li>
+</ul>
+{% endblock %}

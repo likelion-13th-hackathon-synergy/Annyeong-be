@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}프로필 수정{% endblock %}
+{% block content %}
+<h2>프로필 수정</h2>
+
+<section style="margin-bottom: 1.5rem;">
+  <h3>인증배지 (본인확인)</h3>
+
+  {% if user.google_verified %}
+    <p>
+      <span style="padding:4px 8px;border-radius:12px;background:#e6ffed;border:1px solid #b7eb8f;">
+        ✅ 인증됨 · Google
+      </span>
+      <small style="margin-left:6px;color:#666;">ID: {{ user.google_id }}</small>
+    </p>
+
+    <form method="post" action="{% url 'users:remove_google_auth' %}">
+      {% csrf_token %}
+      <button type="submit">구글 인증 해제</button>
+    </form>
+  {% else %}
+    <p style="margin:0 0 .5rem 0;">아직 본인확인이 안 되었어요.</p>
+    <a href="{% url 'users:google_login' %}">
+      <button type="button">Google로 본인확인</button>
+    </a>
+  {% endif %}
+</section>
+
+<form method="post" enctype="multipart/form-data">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button type="submit">저장</button>
+</form>
+{% endblock %}

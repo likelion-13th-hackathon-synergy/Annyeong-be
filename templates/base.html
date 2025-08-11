@@ -1,0 +1,28 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}안녕{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+    <nav>
+        <a href="{% url 'users:login' %}">로그인</a> |
+        <a href="{% url 'users:signup' %}">회원가입</a> |
+        {% if user.is_authenticated %}
+            <a href="{% url 'users:profile_edit' %}">프로필 수정</a> |
+            <a href="{% url 'users:logout' %}">로그아웃</a>
+        {% endif %}
+    </nav>
+    <hr>
+    {% if messages %}
+        <ul>
+            {% for message in messages %}
+                <li>{{ message }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+    {% block content %}{% endblock %}
+</body>
+</html>
