@@ -21,9 +21,14 @@ class MessageSerializer(serializers.ModelSerializer):
 class ChatRoomSerializer(serializers.ModelSerializer):
     requester = UserSerializer(read_only=True)
     receiver = UserSerializer(read_only=True)
-    messages = MessageSerializer(many=True, read_only=True)
+    last_message = serializers.SerializerMethodField()
     unread_count = serializers.IntegerField(read_only=True)
     other_participant = serializers.SerializerMethodField()
+
+    # 생성할 때 receiver_id를 따로 받기 위한 필드 (write_only)
+    receiver_id = serializers.PrimaryKeyRelatedField(
+        queryset=User.objects.all(), write_only=True, source='receiver'
+    )
 
     def get_other_participant(self, obj):
         request = self.context.get('request')
@@ -31,6 +36,10 @@ class ChatRoomSerializer(serializers.ModelSerializer):
         other = obj.get_other_participant(user)
         return UserSerializer(other).data if other else None
 
+    def get_last_message(self, obj):
+        last_msg = obj.messages.order_by('-created_at').first()
+        return MessageSerializer(last_msg).data if last_msg else None
+
     class Meta:
         model = ChatRoom
-        fields = ['id', 'requester', 'receiver', 'other_participant', 'updated_at', 'is_active', 'messages', 'unread_count']
+        fields = ['id', 'requester', 'receiver', 'receiver_id', 'other_participant', 'updated_at', 'is_active', 'last_message', 'unread_count']
