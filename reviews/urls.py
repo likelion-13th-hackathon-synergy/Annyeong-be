@@ -8,7 +8,4 @@ urlpatterns = [
 
     #후기 작성
     path('create/<int:chat_room_id>/', views.create_review, name='create'),
-
-    #AJAX 후기 작성
-    path('ajax/create/', views.ajax_create_review, name='ajax_create'),
 ]
