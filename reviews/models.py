@@ -1,10 +1,11 @@
+from django.conf import settings
 from django.db import models
 from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator, MaxValueValidator
 
 class Review(models.Model):
-    reviewer = models.ForeignKey(User, on_delete=models.CASCADE, related_name='given_reviewer')
-    reviewed_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='reviewed_reviewer')
+    reviewer = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='given_reviewer')
+    reviewed_user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='reviewed_reviewer')
 
     #성격 선택(10개 중 최대 3개 다중선택 가능)
     personality_1 = models.BooleanField(default=False, verbose_name="성격문장 1")
