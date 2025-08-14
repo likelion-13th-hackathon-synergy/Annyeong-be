@@ -17,4 +17,6 @@ urlpatterns = [
     path('auth/google/', views.google_login, name='google_login'),
     path('auth/google/callback/', views.google_callback, name='google_callback'),
     path('auth/google/remove/', views.remove_google_auth, name='remove_google_auth'),
+
+    path('profile/preview/', views.profile_preview_api, name='profile_preview_api'),
 ]
