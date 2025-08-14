@@ -27,4 +27,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', home_redirect, name='home'),
     path('users/', include(('users.urls', 'users'), namespace='users')),
+    path('reviews/', include('reviews.urls')),
 ]
+
