@@ -19,11 +19,18 @@ def signup(request):
 
     if request.method == 'POST':
         form = SignUpForm(request.POST)
-        if form.is_valid():
+        if (form.is_valid()):
             user = form.save()
-            login(request, user)
+            from django.contrib.auth import login, authenticate
+
+            #유저 다시 인증 -> backend 정보 불러오기
+            auth_user = authenticate(username=form.cleaned_data['username'],
+                                     password=form.cleaned_data['password1'])
+            login(request, auth_user)
             messages.success(request, f'{user.real_name}님, 환영합니다! 프로필을 완성해보세요.')
             return redirect('users:profile_edit')
+        else:
+            print("Form errors:", form.errors)
     else:
         form = SignUpForm()
 
@@ -35,15 +42,50 @@ def login_view(request):
 
     if request.method == 'POST':
         form = LoginForm(request.POST)
+        print("=== LOGIN DEBUG ===")
+        print("Form valid?", form.is_valid())
+        print("Form errors:", form.errors)
+        print("Form data:", request.POST)
+
         if form.is_valid():
             username = form.cleaned_data['username']
             password = form.cleaned_data['password']
-            user = authenticate(username=username, password=password)
-            if user:
-                login(request, user)
-                messages.success(request, f'{user.real_name}님, 환영합니다!')
-                next_url = request.GET.get('next', 'users:profile')
-                return redirect(next_url)
+
+            print(f"Attempting login with username: '{username}'")
+            print(f"Password: '{password}' (length: {len(password)})")
+
+            # 사용자 존재 여부 확인
+            from django.contrib.auth import get_user_model
+            User = get_user_model()
+
+            try:
+                db_user = User.objects.get(username=username)
+                print(f"User found in DB: {db_user}")
+                print(f"User is active: {db_user.is_active}")
+                print(f"Password check result: {db_user.check_password(password)}")
+                print(f"Stored password hash: {db_user.password[:50]}...")
+            except User.DoesNotExist:
+                print(f"User '{username}' does not exist in database")
+                messages.error(request, '존재하지 않는 사용자입니다.')
+                return render(request, 'users/login.html', {'form': form})
+
+            # Django authenticate 시도
+            user = authenticate(request, username=username, password=password)
+            print(f"Django authenticate result: {user}")
+
+            if user is not None:
+                if user.is_active:
+                    login(request, user)
+                    messages.success(request, f'{user.real_name}님, 환영합니다!')
+                    next_url = request.GET.get('next', 'users:profile')
+                    print(f"Login successful, redirecting to: {next_url}")
+                    return redirect(next_url)
+                else:
+                    messages.error(request, '비활성화된 계정입니다.')
+            else:
+                messages.error(request, '아이디 또는 비밀번호가 잘못되었습니다.')
+        else:
+                messages.error(request, '입력 정보를 다시 확인해주세요.')
     else:
         form = LoginForm()
     return render(request, 'users/login.html', {'form': form})
@@ -64,9 +106,9 @@ def profile_edit_view(request):
         if form.is_valid():
             user = form.save(commit=False)
 
-            purposes = form.cleaned_data.get('purposes')
-            if purposes is not None:
-                user.purposes = list(purposes)
+            purpose = form.cleaned_data.get('purpose')
+            if purpose is not None:
+                user.purpose = list(purpose)
 
             user.save()
             messages.success(request, '프로필이 수정되었습니다.')
@@ -78,9 +120,15 @@ def profile_edit_view(request):
 
 #구글 관련 뷰들
 def google_login(request):
-    google_oauth_url = 'https://accounts.google.com/oauth2/authorize'
+    google_oauth_url = 'https://accounts.google.com/o/oauth2/v2/auth'
+
+    print("=== Google Login View Called ===")
+    print("Request path:", request.path)
+    print("User authenticated?", request.user.is_authenticated)
+    print("Request GET params:", request.GET)
 
     request.session['pending_user_id'] = request.user.id
+    print("Pending user ID in session:", request.session['pending_user_id'])
 
     params = {
         'client_id': settings.GOOGLE_OAUTH_CLIENT_ID,
@@ -92,18 +140,24 @@ def google_login(request):
     }
 
     url = f"{google_oauth_url}?{urlencode(params)}"
+    print("Redirecting to:", url)
     return redirect(url)
 
 
 @login_required
 def google_callback(request):
+    print("=== Google callback reached ===")
+    print("Full path:", request.get_full_path())
+    print("GET params:", request.GET)
+    print("Session keys:", list(request.session.keys()))
+
     code = request.GET.get('code')
 
     if not code:
         messages.error(request, '구글 인증에 실패했습니다.')
         return redirect('users:login')
 
-    pending_user_id = request.session('pending_user_id')
+    pending_user_id = request.session.get('pending_user_id')
     if not pending_user_id:
         messages.error(request, '세션이 만료되었습니다. 다시 시도해주세요.')
         return redirect('users:login')
