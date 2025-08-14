@@ -50,34 +50,77 @@ class LoginForm(forms.Form):
         label='비밀번호'
     )
 
+CITY_CHOICES = [
+    ('서울특별시', '서울특별시'),
+    ('부산광역시', '부산광역시'),
+    ('대구광역시', '대구광역시'),
+    ('인천광역시', '인천광역시'),
+    ('광주광역시', '광주광역시'),
+    ('대전광역시', '대전광역시'),
+    ('울산광역시', '울산광역시'),
+    ('세종특별자치시', '세종특별자치시'),
+    ('경기도', '경기도'),
+    ('강원특별자치도', '강원특별자치도'),
+    ('충청북도', '충청북도'),
+    ('충청남도', '충청남도'),
+    ('전북특별자치도', '전북특별자치도'),
+    ('전라남도', '전라남도'),
+    ('경상북도', '경상북도'),
+    ('경상남도', '경상남도'),
+    ('제주특별자치도', '제주특별자치도'),
+]
+
 class ProfileForm(forms.ModelForm):
-    purpose = forms.MultipleChoiceField(
-        choices=User.PURPOSE_CHOICES,
-        widget=forms.CheckboxSelectMultiple(attrs={
-            'class': 'form-check-input',
+    real_name = forms.CharField(
+        max_length=50,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': '실명을 입력하세요',
         }),
+        label='이름'
+    )
+
+    age = forms.CharField(
         required=False,
-        label='목적(복수 선택 가능)'
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': '나이를 입력하세요',
+        }),
+        label='나이'
+    )
+
+    nationality = forms.CharField(
+        required=False,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': '예: 대한민국',
+        }),
+        label='국적'
+    )
+
+    city = forms.ChoiceField(
+        choices=[('', '시/도')] + CITY_CHOICES,
+        widget=forms.Select(attrs={'class': "form-control"}),
+        required=False,
+        label='시/도'
+    )
+
+    translation_category = forms.ChoiceField(
+        choices=[('', '번역 언어 선택')] + User.LANGUAGE_CHOICES,
+        widget=forms.Select(attrs={'class': "form-control"}),
+        required=False,
+        label='번역'
     )
 
     class Meta:
         model = User
         fields = [
-            'age', 'profile_image', 'nationality', 'purpose',
-        'introduction', 'city', 'district', 'service_language',]
+            'real_name', 'age', 'profile_image', 'nationality',
+            'introduction', 'city', 'service_language','translation_category']
         widgets = {
-            'age': forms.NumberInput(attrs={
-                'class': 'form-control',
-                'min': 18,
-                'max': 100
-            }),
             'profile_image': forms.FileInput(attrs={
                 'class': 'form-control',
                 'accept': 'image/*'
-            }),
-            'nationality': forms.Select(attrs={
-                'class': 'form-control',
-                'placeholder': '예: 대한민국, 미국 등'
             }),
             'introduction': forms.Textarea(attrs={
                 'class': 'form-control',
@@ -85,20 +128,7 @@ class ProfileForm(forms.ModelForm):
                 'placeholder': '자신을 소개해보세요 (최대 500자)',
                 'maxlength': 500
             }),
-            'city': forms.Select(attrs={
-                'class': 'form-control',
-                'placeholder': '예: 서울특별시, 부산광역시 등'
-            }),
-            'district': forms.Select(attrs={
-                'class': 'form-control',
-                'placeholder': '예: 강남구, 해운대구 등'
-            }),
             'service_language': forms.Select(attrs={
                 'class': 'form-control'
             })
         }
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        if self.instance and self.instance.purpose:
-            self.initial['purpose'] = self.instance.purpose
