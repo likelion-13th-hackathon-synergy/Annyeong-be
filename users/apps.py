@@ -1,0 +1,14 @@
+from django.apps import AppConfig
+
+class UsersConfig(AppConfig):
+    default_auto_field = 'django.db.models.BigAutoField'
+    name = 'users'
+    verbose_name = '사용자 관리'
+
+# reviews/apps.py
+from django.apps import AppConfig
+
+class ReviewsConfig(AppConfig):
+    default_auto_field = 'django.db.models.BigAutoField'
+    name = 'reviews'
+    verbose_name = '리뷰 관리'

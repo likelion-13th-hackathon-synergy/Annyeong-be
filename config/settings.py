@@ -26,8 +26,7 @@ SECRET_KEY = 'django-insecure-5*(e+7t0h6&03&qz#8yk4+i#w&0b0n^5iafeh@q7!g7h*7hpmb
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1']
-
+ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'testserver']
 
 # Application definition
 
@@ -44,11 +43,28 @@ INSTALLED_APPS = [
     'match',
 ]
 
+# users 앱 추가
+INSTALLED_APPS += [
+    'users',
+]
+
+AUTH_USER_MODEL = 'users.User'
+
+# 로그인 관련 URL 추가
+LOGIN_URL = '/users/login/'
+LOGIN_REDIRECT_URL = '/users/profile/'
+LOGOUT_REDIRECT_URL = '/users/login/'
+
+# 세션 설정 추가
+SESSION_COOKIE_AGE = 1209600
+SESSION_SAVE_EVERY_REQUEST = True
+SESSION_EXPIRE_AT_BROWSER_CLOSE = False
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    # 'django.middleware.csrf.CsrfViewMiddleware',
+    #'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -139,10 +155,10 @@ DEEPL_API_KEY = os.getenv('DEEPL_API_KEY')  # 환경 변수에서 API 키 읽기
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        #'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
     ],
     'DEFAULT_PERMISSION_CLASSES': [
-        #'rest_framework.permissions.IsAuthenticated',
+        'rest_framework.permissions.IsAuthenticated',
     ],
 }
 
