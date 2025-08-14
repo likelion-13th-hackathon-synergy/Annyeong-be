@@ -9,6 +9,8 @@ from django.http import JsonResponse
 import requests
 import json
 from urllib.parse import urlencode
+from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_GET
 
 from .forms import SignUpForm, LoginForm, ProfileForm
 from .models import User
@@ -105,11 +107,6 @@ def profile_edit_view(request):
         form = ProfileForm(request.POST, request.FILES, instance=request.user)
         if form.is_valid():
             user = form.save(commit=False)
-
-            purpose = form.cleaned_data.get('purpose')
-            if purpose is not None:
-                user.purpose = list(purpose)
-
             user.save()
             messages.success(request, '프로필이 수정되었습니다.')
             return redirect('users:profile')
@@ -219,3 +216,22 @@ def remove_google_auth(request):
         messages.info(request, '구글 인증이 제거되었습니다.')
 
     return redirect('users:profile_edit')
+
+#미리보기 기능 - 데이터 제공
+@login_required
+@require_GET
+def profile_preview_api(request):
+    #매칭화면에서 보여줄 프로필 미리보기 데이터
+    user = request.user
+    data = {
+        "real_name": user.real_name,
+        "age": user.age,
+        "profile_image": request.build_absolute_uri(user.profile_image.url) if user.profile_image else None,
+        "nationality": user.nationality,
+        "introduction": user.introduction,
+        "city": user.city,
+        "service_language": user.service_language,
+        "google_verified": user.google_verified,
+    }
+    print("=== Preview API Data ===", data)
+    return JsonResponse(data)
