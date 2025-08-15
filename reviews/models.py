@@ -7,7 +7,7 @@ class Review(models.Model):
     reviewer = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='given_reviewer')
     reviewed_user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='reviewed_reviewer')
 
-    #성격 선택(10개 중 최대 3개 다중선택 가능)
+    #성격 선택(10개 중 최대 5개 다중선택 가능)
     personality_1 = models.BooleanField(default=False, verbose_name="성격문장 1")
     personality_2 = models.BooleanField(default=False, verbose_name="성격문장 2")
     personality_3 = models.BooleanField(default=False, verbose_name="성격문장 3")
