@@ -9,12 +9,17 @@ class User(AbstractUser):
     ]
 
     LANGUAGE_CHOICES = [
-        ('ko', 'Korean'),
-        ('en', 'English'),
         ('zh', 'Chinese'),
-        ('th', 'Thai'),
-        ('vi', 'Vietnamese'),
+        ('en', 'English'),
         ('ja', 'Japanese'),
+        ('ja', 'Japanese'),
+        ('mn', 'Mongolian'),
+        ('mm', 'Myanmar'),
+        ('ne', 'Nepali'),
+        ('ko', 'Korean'),
+        ('th', 'Thai'),
+        ('uz', 'Uzbek'),
+        ('vi', 'Vietnamese'),
     ]
 
     #기본 정보
