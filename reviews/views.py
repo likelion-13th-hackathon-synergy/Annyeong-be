@@ -89,9 +89,9 @@ def handle_review_submission(request, other_user):
     #선택된 성격들 가져오기
     selected_personalities = request.POST.getlist('personalities')
 
-    #최대 3개 선택 기능
-    if len(selected_personalities) > 3:
-        messages.error(request, '최대 3개까지만 선택할 수 있습니다.')
+    #최대 5개 선택 기능
+    if len(selected_personalities) > 5:
+        messages.error(request, '최대 5개까지만 선택할 수 있습니다.')
         return redirect('reviews:create', chat_room_id=request.POST.get('chat_room_id'))
 
     if len(selected_personalities) == 0:
