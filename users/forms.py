@@ -51,16 +51,16 @@ class LoginForm(forms.Form):
     )
 
 NATIONALITY_CHOICES = [
-    ('CN', '중국'),
-    ('VN', '베트남'),
-    ('MM', '미얀마'),
-    ('UZ', '우즈벡'),
-    ('MN', '몽골'),
-    ('NP', '네팔'),
-    ('US', '미국'),
-    ('JP', '일본'),
-    ('TH', '태국'),
-    ('KR', '한국'),
+    ('CN', 'China'),
+    ('VN', 'Vietnam'),
+    ('MM', 'Myanmar'),
+    ('UZ', 'Uzbekistan'),
+    ('MN', 'Mongolia'),
+    ('NP', 'Nepal'),
+    ('US', 'United States'),
+    ('JP', 'Japan'),
+    ('TH', 'Thailand'),
+    ('KR', 'South Korea'),
 ]
 
 CITY_CHOICES = [
