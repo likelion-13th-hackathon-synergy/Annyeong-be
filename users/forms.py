@@ -50,6 +50,19 @@ class LoginForm(forms.Form):
         label='비밀번호'
     )
 
+NATIONALITY_CHOICES = [
+    ('CN', '중국'),
+    ('VN', '베트남'),
+    ('MM', '미얀마'),
+    ('UZ', '우즈벡'),
+    ('MN', '몽골'),
+    ('NP', '네팔'),
+    ('US', '미국'),
+    ('JP', '일본'),
+    ('TH', '태국'),
+    ('KR', '한국'),
+]
+
 CITY_CHOICES = [
     ('서울특별시', '서울특별시'),
     ('부산광역시', '부산광역시'),
@@ -89,12 +102,10 @@ class ProfileForm(forms.ModelForm):
         label='나이'
     )
 
-    nationality = forms.CharField(
+    nationality = forms.ChoiceField(
+        choices=[('', '국가 선택')] + NATIONALITY_CHOICES,
+        widget=forms.Select(attrs={'class': 'form-control'}),
         required=False,
-        widget=forms.TextInput(attrs={
-            'class': 'form-control',
-            'placeholder': '예: 대한민국',
-        }),
         label='국적'
     )
 
