@@ -10,16 +10,12 @@ class User(AbstractUser):
 
     LANGUAGE_CHOICES = [
         ('zh', 'Chinese'),
+        ('vi', 'Vietnamese'),
         ('en', 'English'),
         ('ja', 'Japanese'),
-        ('ja', 'Japanese'),
-        ('mn', 'Mongolian'),
-        ('mm', 'Myanmar'),
-        ('ne', 'Nepali'),
-        ('ko', 'Korean'),
         ('th', 'Thai'),
-        ('uz', 'Uzbek'),
-        ('vi', 'Vietnamese'),
+        ('ko', 'Korean'),
+        ('ru', 'Russian'),
     ]
 
     NATIONALITY_CHOICES = [
