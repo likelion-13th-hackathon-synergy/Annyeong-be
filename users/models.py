@@ -45,13 +45,14 @@ class User(AbstractUser):
         verbose_name = '프로필 사진'
     )
 
-    nationality = models.CharField(max_length=50, null=True, blank=True, verbose_name='국적')
+    nationality = models.CharField(max_length=50, choices=NATIONALITY_CHOICES, null=True, blank=True, verbose_name='국적')
     introduction = models.TextField(max_length=500, null=True, blank=True, verbose_name='소개글')
 
     #거주지역
     city = models.CharField(max_length=50, null=True, blank=True, verbose_name='시/도')
 
     #서비스 설정
+
     service_language = models.CharField(max_length=5, choices=LANGUAGE_CHOICES, default='ko', verbose_name='언어')
     translation_category = models.CharField(max_length=5, choices=LANGUAGE_CHOICES, null=True, blank=True, verbose_name='번역')
 
