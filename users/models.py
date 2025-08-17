@@ -22,6 +22,17 @@ class User(AbstractUser):
         ('vi', 'Vietnamese'),
     ]
 
+    NATIONALITY_CHOICES = [
+        ('cn', '중국'),
+        ('vn', '베트남'),
+        ('us', '미국'),
+        ('jp', '일본'),
+        ('th', '태국'),
+        ('kr', '한국'),
+        ('ru', '러시아'),
+        ('tw', '대만'),
+    ]
+
     #기본 정보
     real_name = models.CharField(max_length=50, verbose_name='실명')
     user_type = models.CharField(max_length=10, choices=USER_TYPE_CHOICES, verbose_name='사용자 구분')
