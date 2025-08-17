@@ -7,13 +7,13 @@ from .models import User
 
 class CustomUserAdmin(UserAdmin):
     # 목록 페이지에서 보여줄 필드들
-    list_display = ('username', 'real_name', 'user_type', 'age', 'nationality', 'google_auth_status',
-                    'profile_completion', 'date_joined')
-    list_filter = ('user_type', 'google_verified', 'nationality', 'service_language', 'date_joined')
+    list_display = ('username', 'real_name', 'user_type', 'age', 'nationality',
+    'translation_category', 'google_auth_status', 'date_joined')
+    list_filter = ('user_type', 'google_verified', 'nationality', 'service_language',
+        'translation_category', 'date_joined')
     search_fields = ('username', 'real_name', 'nationality', 'google_id')
 
     def google_auth_status(self, obj):
-        """구글 인증 상태를 시각적으로 표시"""
         if obj.google_verified:
             return format_html(
                 '<span style="color: green;">✅ 인증완료</span><br><small>{}</small>',
@@ -24,31 +24,16 @@ class CustomUserAdmin(UserAdmin):
 
     google_auth_status.short_description = '구글 인증'
 
-    def profile_completion(self, obj):
-        """프로필 완성도 표시"""
-        fields = [obj.age, obj.profile_image, obj.nationality, obj.purpose,
-                  obj.introduction, obj.city, obj.district]
-        completed = sum(1 for field in fields if field)
-        percentage = int((completed / len(fields)) * 100)
-
-        color = 'green' if percentage >= 80 else 'orange' if percentage >= 50 else 'red'
-        return format_html(
-            '<span style="color: {};">{}/7 ({}%)</span>',
-            color, completed, percentage
-        )
-
-    profile_completion.short_description = '프로필 완성도'
-
     # 상세 페이지 필드 그룹화
     fieldsets = UserAdmin.fieldsets + (
         ('개인 정보', {
             'fields': ('real_name', 'user_type', 'age', 'nationality', 'profile_image')
         }),
         ('프로필 정보', {
-            'fields': ('purpose', 'introduction', 'city', 'district')
+            'fields': ('introduction', 'city')
         }),
         ('인증 및 설정', {
-            'fields': ('google_verified', 'google_id', 'service_language')
+            'fields': ('google_verified', 'google_id', 'service_language', 'translation_category')
         }),
     )
 

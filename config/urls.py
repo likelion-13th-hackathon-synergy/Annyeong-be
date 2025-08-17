@@ -24,6 +24,7 @@ urlpatterns = [
     path('api/chat/', include('chat.urls')),
     path('api/match/', include('match.urls')),
     path('users/', include(('users.urls', 'users'), namespace='users')),
+    path('reviews/', include('reviews.urls')),
 ]
 
 if settings.DEBUG:
