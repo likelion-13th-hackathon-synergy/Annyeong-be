@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 import os
 from pathlib import Path
+from decouple import config
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -24,7 +25,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv('SECRET_KEY')
+SECRET_KEY = os.getenv('SECRET_KEY', config("SECRET_KEY", default="unsafe-secret"))
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
@@ -128,17 +129,29 @@ ASGI_APPLICATION = 'config.asgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
+SUPABASE_URL = config("SUPABASE_URL")
+SUPABASE_SERVICE_KEY = config("SUPABASE_SERVICE_KEY")
+SUPABASE_ANON_KEY = config("SUPABASE_ANON_KEY")
+
 # PostgreSQL (Supabase)
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.getenv('POSTGRES_DB'),
-        'USER': os.getenv('POSTGRES_USER'),
-        'PASSWORD': os.getenv('POSTGRES_PASSWORD'),
-        'HOST': os.getenv('POSTGRES_HOST'),
-        'PORT': os.getenv('POSTGRES_PORT', 5432),
+    "default": {
+        "ENGINE": "django.db.backends.postgresql",
+        "NAME": config("POSTGRES_DB"),
+        "USER": config("POSTGRES_USER"),
+        "PASSWORD": config("POSTGRES_PASSWORD"),
+        "HOST": config("POSTGRES_HOST"),
+        "PORT": config("POSTGRES_PORT", cast=int),
     }
 }
+
+# Supabase Storage
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+AWS_ACCESS_KEY_ID = os.getenv('SUPABASE_SERVICE_KEY')
+AWS_SECRET_ACCESS_KEY = os.getenv('SUPABASE_SERVICE_KEY')
+AWS_STORAGE_BUCKET_NAME = os.getenv('SUPABASE_BUCKET_NAME')
+AWS_S3_ENDPOINT_URL = os.getenv('SUPABASE_URL') + '/storage/v1'
+AWS_QUERYSTRING_AUTH = False
 
 AUTH_USER_MODEL = 'users.User'
 
@@ -192,14 +205,6 @@ CHANNEL_LAYERS = {
         },
     },
 }
-
-# Supabase Storage
-DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
-AWS_ACCESS_KEY_ID = os.getenv('SUPABASE_ACCESS_KEY')
-AWS_SECRET_ACCESS_KEY = os.getenv('SUPABASE_SECRET_KEY')
-AWS_STORAGE_BUCKET_NAME = os.getenv('SUPABASE_BUCKET_NAME')
-AWS_S3_ENDPOINT_URL = os.getenv('SUPABASE_URL') + '/storage/v1'
-AWS_QUERYSTRING_AUTH = False
 
 DEEPL_API_KEY = os.getenv('DEEPL_API_KEY')  # 환경 변수에서 API 키 읽기
 

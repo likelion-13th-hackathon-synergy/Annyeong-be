@@ -19,11 +19,14 @@ idna==3.10
 incremental==24.7.2
 msgpack==1.1.1
 pillow==11.3.0
+psycopg==3.2.9
+psycopg-binary==3.2.9
 pyasn1==0.6.1
 pyasn1_modules==0.4.2
 pycparser==2.22
 PyJWT==2.10.1
 pyOpenSSL==25.1.0
+python-decouple==3.8
 python-dotenv==1.1.1
 redis==6.4.0
 requests==2.32.4
