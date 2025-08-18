@@ -24,13 +24,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-fallback-key-for-development')
-
+SECRET_KEY = os.getenv('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'testserver']
+ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '*').split(',')
 
 # Application definition
 
@@ -45,13 +44,8 @@ INSTALLED_APPS = [
     'channels',
     'chat',
     'match',
-]
-
-# users 앱 추가
-INSTALLED_APPS += [
     'users',
     'reviews',
-
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
@@ -128,15 +122,21 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'config.wsgi.application'
+ASGI_APPLICATION = 'config.asgi.application'
 
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
+# PostgreSQL (Supabase)
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.getenv('POSTGRES_DB'),
+        'USER': os.getenv('POSTGRES_USER'),
+        'PASSWORD': os.getenv('POSTGRES_PASSWORD'),
+        'HOST': os.getenv('POSTGRES_HOST'),
+        'PORT': os.getenv('POSTGRES_PORT', 5432),
     }
 }
 
@@ -177,7 +177,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
@@ -188,10 +188,18 @@ CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels_redis.core.RedisChannelLayer', # Redis를 메시지 브로커로 사용
         'CONFIG': {
-            'hosts': [('127.0.0.1', 6379)], # 로컬 Redis 서버 연결 (기본 포트)
+            'hosts': [(os.getenv('REDIS_HOST'), int(os.getenv('REDIS_PORT', 6379)))],
         },
     },
 }
+
+# Supabase Storage
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+AWS_ACCESS_KEY_ID = os.getenv('SUPABASE_ACCESS_KEY')
+AWS_SECRET_ACCESS_KEY = os.getenv('SUPABASE_SECRET_KEY')
+AWS_STORAGE_BUCKET_NAME = os.getenv('SUPABASE_BUCKET_NAME')
+AWS_S3_ENDPOINT_URL = os.getenv('SUPABASE_URL') + '/storage/v1'
+AWS_QUERYSTRING_AUTH = False
 
 DEEPL_API_KEY = os.getenv('DEEPL_API_KEY')  # 환경 변수에서 API 키 읽기
 
