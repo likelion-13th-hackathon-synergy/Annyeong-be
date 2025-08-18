@@ -2,9 +2,6 @@ import json
 from asgiref.sync import sync_to_async
 from channels.generic.websocket import AsyncWebsocketConsumer
 from django.utils import timezone
-from django.contrib.auth import get_user_model
-
-User = get_user_model()
 
 class ChatConsumer(AsyncWebsocketConsumer):
     # WebSocket 연결 시 실행
@@ -29,6 +26,9 @@ class ChatConsumer(AsyncWebsocketConsumer):
     @sync_to_async
     def save_message(self, sender_id, message, translated_content=None):
         from .models import ChatRoom, Message
+        from django.contrib.auth import get_user_model
+
+        User = get_user_model()
 
         sender = User.objects.get(id=sender_id)
         chatroom = ChatRoom.objects.get(id=self.room_id)
