@@ -135,7 +135,7 @@ def mark_messages_read(request, chat_id):
 
 def create_chat_request(from_user, to_user):
     # 채팅방 생성
-    chatroom = ChatRoom.objects.create(requester=from_user, receiver=to_user, is_active=False)
+    chatroom = ChatRoom.objects.create(requester=from_user, receiver=to_user, chat_mode=from_user.current_mode, is_active=False)
 
     # 초대 메시지 자동 생성
     intro_msg = f"(요청) 새로운 인연이 시작될까요? {from_user.username} 님이 호감을 표시했어요!"

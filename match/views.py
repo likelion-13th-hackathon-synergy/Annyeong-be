@@ -6,6 +6,7 @@ from .models import UserMatchPreference, MatchLike, MatchDislike
 from .serializers import UserMatchPreferenceSerializer, MatchLikeSerializer
 from chat.models import ChatRoom
 from chat.views import create_chat_request
+from users.serializers import UserSerializer
 
 User = get_user_model()
 
@@ -57,7 +58,8 @@ class RandomMatchUserAPIView(APIView):
         chosen_id = random.choice(candidates)
         chosen_user = User.objects.get(id=chosen_id)
 
-        return Response({"id": chosen_user.id, "username": chosen_user.username})
+        serializer = UserSerializer(chosen_user)
+        return Response(serializer.data, status=200)
 
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated

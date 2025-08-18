@@ -6,6 +6,7 @@ User = get_user_model()
 class ChatRoom(models.Model):
     requester = models.ForeignKey(User, related_name="requested_chatrooms", on_delete=models.CASCADE)  # 요청자
     receiver = models.ForeignKey(User, related_name="received_chatrooms", on_delete=models.CASCADE)  # 수신자
+    chat_mode = models.CharField(max_length=20) # 생성 시점 모드
     updated_at = models.DateTimeField(auto_now=True)
     is_active = models.BooleanField(default=False)  # 대화 요청 수락 시 True
 
