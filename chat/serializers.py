@@ -40,7 +40,7 @@ class ChatRoomSerializer(serializers.ModelSerializer):
         return UserSerializer(other).data if other else None
 
     def get_last_message(self, obj):
-        last_msg = obj.messages.order_by('-created_at').first()
+        last_msg = Message.objects.filter(chatroom=obj).order_by('-created_at').first()
         return MessageSerializer(last_msg).data if last_msg else None
 
     class Meta:
