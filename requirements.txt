@@ -13,6 +13,7 @@ daphne==4.2.1
 deepl==1.22.0
 Django==5.2.5
 django-allauth==65.11.0
+django-cors-headers==4.7.0
 djangorestframework==3.16.1
 hyperlink==21.0.0
 idna==3.10
