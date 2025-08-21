@@ -33,6 +33,8 @@ PERSONALITY_CHOICES = {
     "personality_12": "신뢰할 수 있어요",
 }
 
+PERSONALITY_LABEL_TO_KEY = {v: k for k, v in PERSONALITY_CHOICES.items()}
+
 class CreateReviewView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
@@ -76,15 +78,29 @@ class CreateReviewView(APIView):
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
+        selected_keys = []
+        for personality_label in selected_personalities:
+            key = PERSONALITY_LABEL_TO_KEY.get(personality_label)
+            if not key:
+                return Response(
+                    {"detail": f"유효하지 않은 성격: {personality_label}"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+                selected_keys.append(key)
+
         #Review 객체 생성
-        review = Review.objects.create(
-            author=request.user,
-            target_user=other_user,
-            chatroom=chatroom,
-            **{key: (key in selected_personalities) for key in PERSONALITY_CHOICES.keys()},
-        )
+        review_data = {
+            'reviewwer': request.user,
+            'reviewed_user': other_user,
+        }
+
+        for key in PERSONALITY_CHOICES.keys():
+            review_data[key] = (key in selected_keys)
+
+        review = Review.objects.create(**review_data)
+
         return Response(
-            {"detail": "후기가 작성되었습니다.", "review_id": review.id,},
+            {"message": "후기가 작성되었습니다."},
             status=status.HTTP_201_CREATED,
         )
 
@@ -92,26 +108,49 @@ class UserReviewListView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request, user_id):
-        user = get_object_or_404(User, id=user_id)
+        try:
+            user = get_object_or_404(User, id=user_id)
 
-        reviews = Review.objects.filter(target_user=user)
+        except:
+            return Response(
+                {"detail": "해당 사용자를 찾을 수 없습니다."},
+                status=status.HTTP_403_FOUND,
+            )
 
-        personality_stats = {label: 0 for label in PERSONALITY_CHOICES.values()}
+        #해당 사용자가 받은 모든 리뷰
+        reviews = Review.objects.filter(reviewed_user=user)
 
-        for review in reviews:
-            for key, label in PERSONALITY_CHOICES.items():
-                if getattr(review, key):
-                    personality_stats[label] += 1
+        #총리뷰 참여 횟수(실제 리뷰 개수)
+        total_review_count = reviews.count()
 
-        sorted_stats = sorted(personality_stats.items(), key=lambda x: x[1], reverse=True)
+        #총 성격 선택 횟수 계산
+        total_personality_selections = 0
+
+        #각 성격별 카운트 및 정렬
+        personality_counts = []
+        for key, label in PERSONALITY_CHOICES.items():
+            count = reviews.filter(**{key: True}).count()
+            total_personality_selections += count
+            if count > 0:
+                personality_counts.append((key, label, count))
+
+        #카운트 순으로 정렬
+        personality_counts.sort(key=lambda x: x[2], reverse=True)
+
+
+        reviews_data = []
+        for key, label, count in personality_counts:
+            reviews_data.append({
+                f"personalities_{key.split('_')[1]}": label,
+                "count": count
+            })
 
         return Response(
             {
                 "user_id": user.id,
-                "real_name": user.username,
-                "personalities": [
-                    {"label": label, "count": count} for label, count in sorted_stats
-                ],
+                "total_reviews": total_review_count, #실제 참여 횟수
+                "total_personality_selections": total_personality_selections, #총 성격 횟수
+                "reviews": reviews_data,
             },
             status=status.HTTP_200_OK,
         )

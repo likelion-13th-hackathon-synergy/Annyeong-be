@@ -1,7 +1,25 @@
 from django.contrib.auth import get_user_model
 from django.db.models import Q
+from django.template.defaultfilters import first
+
+from reviews.views import PERSONALITY_CHOICES
 
 User = get_user_model()
+
+PERSONALITY_CHOICES = {
+    'personality_1': '이야기를 잘 들어줘요',
+    'personality_2': '유머 감각이 뛰어나요',
+    'personality_3': '대화가 재미있어요',
+    'personality_4': '긍적적인 마인드예요',
+    'personality_5': '친근하고 따뜻해요',
+    'personality_6': '배려심이 깊어요',
+    'personality_7': '지식이 풍부해요',
+    'personality_8': '호기심이 많아요',
+    'personality_9': '이해심이 많아요',
+    'personality_10': '정직하고 솔직해요',
+    'personality_11': '적극적이고 활발해요',
+    'personality_12': '신뢰할 수 있어요',
+}
 
 
 def get_user_review_stats(user):
@@ -9,46 +27,42 @@ def get_user_review_stats(user):
 
     reviews = Review.objects.filter(reviewed_user=user)
 
-    personality_stats = {
-        '성격1': reviews.filter(personality_1=True).count(),
-        '성격2': reviews.filter(personality_2=True).count(),
-        '성격3': reviews.filter(personality_3=True).count(),
-        '성격4': reviews.filter(personality_4=True).count(),
-        '성격5': reviews.filter(personality_5=True).count(),
-        '성격6': reviews.filter(personality_6=True).count(),
-        '성격7': reviews.filter(personality_7=True).count(),
-        '성격8': reviews.filter(personality_8=True).count(),
-        '성격9': reviews.filter(personality_9=True).count(),
-        '성격10': reviews.filter(personality_10=True).count(),
-    }
+    #통계 반환 시 0으로 초기화
+    personality_stats = {label: 0 for label in PERSONALITY_CHOICES.values()}
+
+
+    #실제 카운트로 업데이트
+    for key, label in PERSONALITY_CHOICES.items():
+        personality_stats[label] = reviews.filter(**{key: True}).count()
 
     total_reviews = reviews.count()
     top_personalities = sorted(personality_stats.items(), key=lambda x: x[1], reverse=True)[:3]
 
     return {
         'total_reviews': total_reviews,
-        'personality_stats': personality_stats,
-        'top_personalities': top_personalities
+        'top_personalities': top_personalities,
+        'personality_stats': personality_stats
     }
 
 
 def can_write_review(reviewer, reviewed_user):
+    #리뷰 작성 가능 여부 확인
+    from chat.models import ChatRoom, Message
 
-    #임시로 True 반환 (채팅 기능 구현 전까지)
-    return True
+    chatroom = ChatRoom.objects.filter(
+        Q(requester=reviewer, receiver=reviewed_user) |
+        Q(requester=reviewed_user, receiver=reviewer),
+        is_active=True
+    ).first()
+
+    if not chatroom:
+        return False
+
+    reviewer_sent = Message.objects.filter(chatroom=chatroom, sender=reviewer).exists()
+    reviewed_user_sent = Message.objects.filter(chatroom=chatroom, sender=reviewed_user).exists()
+
+    return reviewer_sent and reviewed_user_sent
 
 
 def get_personality_name(personality_key):
-    personality_names = {
-        'personality_1': '성격1',
-        'personality_2': '성격2',
-        'personality_3': '성격3',
-        'personality_4': '성격4',
-        'personality_5': '성격5',
-        'personality_6': '성격6',
-        'personality_7': '성격7',
-        'personality_8': '성격8',
-        'personality_9': '성격9',
-        'personality_10': '성격10',
-    }
-    return personality_names.get(personality_key, personality_key)
+    return PERSONALITY_CHOICES.get(personality_key, personality_key)

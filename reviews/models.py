@@ -8,16 +8,18 @@ class Review(models.Model):
     reviewed_user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='reviewed_reviewer')
 
     #성격 선택(10개 중 최대 5개 다중선택 가능)
-    personality_1 = models.BooleanField(default=False, verbose_name="성격문장 1")
-    personality_2 = models.BooleanField(default=False, verbose_name="성격문장 2")
-    personality_3 = models.BooleanField(default=False, verbose_name="성격문장 3")
-    personality_4 = models.BooleanField(default=False, verbose_name="성격문장 4")
-    personality_5 = models.BooleanField(default=False, verbose_name="성격문장 5")
-    personality_6 = models.BooleanField(default=False, verbose_name="성격문장 6")
-    personality_7 = models.BooleanField(default=False, verbose_name="성격문장 7")
-    personality_8 = models.BooleanField(default=False, verbose_name="성격문장 8")
-    personality_9 = models.BooleanField(default=False, verbose_name="성격문장 9")
-    personality_10 = models.BooleanField(default=False, verbose_name="성격문장 10")
+    personality_1 = models.BooleanField(default=False, verbose_name="이야기를 잘 들어줘요 1")
+    personality_2 = models.BooleanField(default=False, verbose_name="유머 감각이 뛰어나요")
+    personality_3 = models.BooleanField(default=False, verbose_name="대화가 재미있어요")
+    personality_4 = models.BooleanField(default=False, verbose_name="긍정적인 마인드예요")
+    personality_5 = models.BooleanField(default=False, verbose_name="친근하고 따뜻해요")
+    personality_6 = models.BooleanField(default=False, verbose_name="배려심이 깊어요")
+    personality_7 = models.BooleanField(default=False, verbose_name="지식이 풍부해요")
+    personality_8 = models.BooleanField(default=False, verbose_name="호기심이 많아요")
+    personality_9 = models.BooleanField(default=False, verbose_name="이해심이 많아요")
+    personality_10 = models.BooleanField(default=False, verbose_name="정직하고 솔직해요")
+    personality_11 = models.BooleanField(default=False, verbose_name="적극적이고 활발해요")
+    personality_12 = models.BooleanField(default=False, verbose_name="신뢰할 수 있어요")
 
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -30,26 +32,25 @@ class Review(models.Model):
 
     def get_selected_personalities(self):
         personalities = []
-        if self.personality_1:
-            personalities.append("성격1")
-        if self.personality_2:
-            personalities.append("성격2")
-        if self.personality_3:
-            personalities.append("성격3")
-        if self.personality_4:
-            personalities.append("성격4")
-        if self.personality_5:
-            personalities.append("성격5")
-        if self.personality_6:
-            personalities.append("성격6")
-        if self.personality_7:
-            personalities.append("성격7")
-        if self.personality_8:
-            personalities.append("성격8")
-        if self.personality_9:
-            personalities.append("성격9")
-        if self.personality_10:
-            personalities.append("성격10")
+        personality_mapping = {
+            'personality_1': '이야기를 잘 들어줘요',
+            'personality_2': '유머 감각이 뛰어나요',
+            'personality_3': '대화가 재미있어요',
+            'personality_4': '긍적적인 마인드예요',
+            'personality_5': '친근하고 따뜻해요',
+            'personality_6': '배려심이 깊어요',
+            'personality_7': '지식이 풍부해요',
+            'personality_8': '호기심이 많아요',
+            'personality_9': '이해심이 많아요',
+            'personality_10': '정직하고 솔직해요',
+            'personality_11': '적극적이고 활발해요',
+            'personality_12': '신뢰할 수 있어요',
+
+        }
+
+        for field, label in personality_mapping.items():
+            if getattr(self, field):
+                personalities.append(label)
         return personalities
 
 
