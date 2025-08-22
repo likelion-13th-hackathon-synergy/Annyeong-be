@@ -1,4 +1,7 @@
+from django.http import JsonResponse
 from django.urls import path
+from django.views.decorators.csrf import ensure_csrf_cookie
+
 from . import views
 from .views import SignupView, LoginView, LogoutView, ProfileView, get_csrf_token
 from .views import (
