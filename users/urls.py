@@ -8,6 +8,10 @@ from .views import (
 
 app_name = 'users'
 
+@ensure_csrf_cookie
+def csrf_ping(request):
+    return JsonResponse({"detail": "ok"})
+
 urlpatterns = [
     #인증
     path("signup/", SignupView.as_view(), name="signup"),
@@ -23,5 +27,7 @@ urlpatterns = [
     path('auth/google/callback/', google_callback, name='google_callback'),
     path('auth/google/remove/', remove_google_auth, name='remove_google_auth'),
     path("csrf/", get_csrf_token, name="get_csrf_token"),
+
+    path("csrf/", csrf_ping, name="csrf"),
 
 ]
