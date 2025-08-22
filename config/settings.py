@@ -28,9 +28,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv('SECRET_KEY', config("SECRET_KEY", default="unsafe-secret"))
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+#DEBUG = False
+DEBUG = True
 
-ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '*').split(',')
+#ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '*').split(',')
+
+ALLOWED_HOSTS = ["127.0.0.1", "localhost", "*"]
 
 # Application definition
 
@@ -67,9 +70,17 @@ LOGIN_REDIRECT_URL = '/users/profile/'
 LOGOUT_REDIRECT_URL = '/users/login/'
 
 # 세션 설정 추가
+#SESSION_COOKIE_AGE = 1209600
+#SESSION_SAVE_EVERY_REQUEST = True
+#SESSION_EXPIRE_AT_BROWSER_CLOSE = False
+
+# 세션 설정 수정 (테스트용)
 SESSION_COOKIE_AGE = 1209600
 SESSION_SAVE_EVERY_REQUEST = True
 SESSION_EXPIRE_AT_BROWSER_CLOSE = False
+SESSION_COOKIE_SAMESITE = "Lax"  #"None"에서 변경
+SESSION_COOKIE_SECURE = False    #True에서 False로 변경 (HTTP 허용)
+SESSION_COOKIE_HTTPONLY = True
 
 GOOGLE_OAUTH_CLIENT_ID = os.getenv('GOOGLE_OAUTH_CLIENT_ID')
 GOOGLE_OAUTH_CLIENT_SECRET = os.getenv('GOOGLE_OAUTH_CLIENT_SECRET')
@@ -223,6 +234,13 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 CORS_ALLOWED_ORIGINS = [
     "http://127.0.0.1:5500",
     "http://localhost:5500",
+    #테스트용 포트 추가
+    "http://127.0.0.1:3000",
+    "http://localhost:3000",
+    "http://127.0.0.1:8080",
+    "http://localhost:8080",
+    "http://127.0.0.1:5173",  # Vite 기본 포트
+    "http://localhost:5173",
 ]
 
 CORS_ALLOW_CREDENTIALS = True
@@ -230,9 +248,20 @@ CORS_ALLOW_CREDENTIALS = True
 CSRF_TRUSTED_ORIGINS = [
     "http://127.0.0.1:5500",
     "http://localhost:5500",
+    #테스트용 추가
+    "http://127.0.0.1:3000",
+    "http://localhost:3000",
+    "http://127.0.0.1:8080",
+    "http://localhost:8080",
+    "http://127.0.0.1:5173",
+    "http://localhost:5173",
 ]
 
-SESSION_COOKIE_SAMESITE = "None"
-CSRF_COOKIE_SAMESITE = "None"
-SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_SECURE = True
+#SESSION_COOKIE_SAMESITE = "None"
+#CSRF_COOKIE_SAMESITE = "None"
+#SESSION_COOKIE_SECURE = True
+#CSRF_COOKIE_SECURE = True
+
+CSRF_COOKIE_SAMESITE = "Lax"  # 기존 "None"에서 변경
+CSRF_COOKIE_SECURE = False     # 기존 True에서 False로 변경
+CSRF_COOKIE_HTTPONLY = False

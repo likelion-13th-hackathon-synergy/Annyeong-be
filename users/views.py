@@ -1,15 +1,12 @@
-from django.shortcuts import render
-from django.shortcuts import render, redirect
-from django.contrib.auth import login, logout, authenticate
-from django.contrib.auth.decorators import login_required
-from django.contrib import messages
 from django.conf import settings
+from django.middleware.csrf import get_token
 from django.urls import reverse
 from django.http import JsonResponse
 import requests
 import json
 from urllib.parse import urlencode
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_GET
 from django.views.generic import CreateView
 from rest_framework.decorators import api_view, permission_classes
@@ -23,6 +20,16 @@ from django.contrib.auth import authenticate, login, logout, get_user_model
 from .serializers import UserSerializer, SignupSerializer
 
 User = get_user_model()
+
+@ensure_csrf_cookie
+def get_csrf_token(request):
+    """CSRF 토큰을 반환하는 뷰"""
+    csrf_token = get_token(request)
+    return JsonResponse({
+        "csrfToken": csrf_token,
+        "sessionid": request.session.session_key,
+        "ok": True
+    })
 
 class SignupView(APIView):
     permission_classes = [permissions.AllowAny]

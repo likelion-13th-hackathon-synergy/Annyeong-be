@@ -1,6 +1,6 @@
 from django.urls import path
 from . import views
-from .views import SignupView, LoginView, LogoutView, ProfileView
+from .views import SignupView, LoginView, LogoutView, ProfileView, get_csrf_token
 from .views import (
     SignupView, LoginView, LogoutView, ProfileView,
     google_login, google_callback, remove_google_auth, profile_preview_api,
@@ -22,5 +22,6 @@ urlpatterns = [
     path('auth/google/', google_login, name='google_login'),
     path('auth/google/callback/', google_callback, name='google_callback'),
     path('auth/google/remove/', remove_google_auth, name='remove_google_auth'),
+    path("csrf/", get_csrf_token, name="get_csrf_token"),
 
 ]
