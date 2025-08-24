@@ -57,10 +57,10 @@ class CreateReviewView(APIView):
         #상대방 찾기
         other_user = chatroom.get_other_participant(request.user)
 
-        #이미 이 채팅에서 후기 작성했는지 확인
-        if Review.objects.filter(author=request.user, target_user=other_user, chatroom=chatroom).exists():
+        #이미 이 채팅에서 후기 작성했는지 확인(중복체크)
+        if Review.objects.filter(reviewer=request.user, reviewed_user=other_user).exists():
             return Response(
-                {"detail": "이미 후기를 작성했습니다."},
+                {"detail": "이미 후기를 작성했습니다.", "already_reviewed": True},
                 status=status.HTTP_400_BAD_REQUEST,
             )
 
@@ -86,11 +86,11 @@ class CreateReviewView(APIView):
                     {"detail": f"유효하지 않은 성격: {personality_label}"},
                     status=status.HTTP_400_BAD_REQUEST,
                 )
-                selected_keys.append(key)
+            selected_keys.append(key)
 
         #Review 객체 생성
         review_data = {
-            'reviewwer': request.user,
+            'reviewer': request.user,
             'reviewed_user': other_user,
         }
 
@@ -100,7 +100,12 @@ class CreateReviewView(APIView):
         review = Review.objects.create(**review_data)
 
         return Response(
-            {"message": "후기가 작성되었습니다."},
+            {
+                "message": "후기가 작성되었습니다.",
+                "review_id": review.id,
+                "reviewed_user_id": other_user.id,
+                "reviewed_user_name": other_user.username
+            },
             status=status.HTTP_201_CREATED,
         )
 
@@ -108,14 +113,7 @@ class UserReviewListView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request, user_id):
-        try:
-            user = get_object_or_404(User, id=user_id)
-
-        except:
-            return Response(
-                {"detail": "해당 사용자를 찾을 수 없습니다."},
-                status=status.HTTP_403_FOUND,
-            )
+        user = get_object_or_404(User, id=user_id)
 
         #해당 사용자가 받은 모든 리뷰
         reviews = Review.objects.filter(reviewed_user=user)
@@ -148,9 +146,43 @@ class UserReviewListView(APIView):
         return Response(
             {
                 "user_id": user.id,
+                "username": user.username,
                 "total_reviews": total_review_count, #실제 참여 횟수
                 "total_personality_selections": total_personality_selections, #총 성격 횟수
                 "reviews": reviews_data,
             },
             status=status.HTTP_200_OK,
         )
+
+class CanWriteReviewView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request, chat_room_id):
+        chatroom = get_object_or_404(ChatRoom, id=chat_room_id)
+
+        if not chatroom.is_active:
+            return Response(
+                {
+                    "can_write": False,
+                    "reason": "아직 수락되지 않은 대화입니다."
+                }
+            )
+
+        if request.user not in [chatroom.requester, chatroom.receiver]:
+            return Response({
+                "can_write": False,
+                "reason": "이 채팅의 참가자가 아닙니다.",
+            })
+
+        other_user = chatroom.get_other_participant(request.user)
+        already_reviewed = Review.objects.filter(
+            reviewer=request.user,
+            reviewed_user=other_user,
+        ).exists()
+
+        return Response({
+            "can_write": not already_reviewed,
+            "already_reviewed": already_reviewed,
+            "other_user_id": other_user.id,
+            "other_user_name": other_user.username,
+        })
