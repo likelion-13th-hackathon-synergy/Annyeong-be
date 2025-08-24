@@ -2,6 +2,7 @@ from django.conf import settings
 from django.middleware.csrf import get_token
 from django.urls import reverse
 from django.http import JsonResponse
+from django.middleware.csrf import get_token
 import requests
 import json
 from urllib.parse import urlencode
@@ -10,6 +11,8 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from django.views.decorators.http import require_GET
 from django.views.generic import CreateView
 from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
 from rest_framework.permissions import AllowAny, IsAuthenticated
 
 from .models import User
@@ -78,6 +81,10 @@ class ProfileView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+def csrf(request):
+    return JsonResponse({"csrfToken": get_token(request)})
+
+
 #구글 관련 뷰들
 def google_login(request):
     if not request.user.is_authenticated:
@@ -141,7 +148,8 @@ def google_callback(request):
         if "pending_user_id" in request.session:
             del request.session["pending_user_id"]
 
-        return JsonResponse({"detail": "구글 인증이 완료되었습니다."}, status=200)
+        #return JsonResponse({"detail": "구글 인증이 완료되었습니다."}, status=200)
+        return redirect("/profile/profile.html?google=ok")
 
     except Exception as e:
         if "pending_user_id" in request.session:
@@ -159,19 +167,23 @@ def remove_google_auth(request):
     return JsonResponse({"detail": "허용되지 않은 메서드입니다."}, status=405)
 
 
-#미리보기 기능
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
-def profile_preview_api(request):
-    user = request.user
-    data = {
-        "real_name": user.real_name,
-        "age": user.age,
-        "profile_image": request.build_absolute_uri(user.profile_image.url) if user.profile_image and hasattr(user.profile_image, 'url') else None,
-        "nationality": user.nationality,
-        "introduction": user.introduction,
-        "city": user.city,
-        "service_language": user.service_language,
-        "google_verified": user.google_verified,
+def google_login(request):
+    # JWT 인증된 사용자
+    request.session["pending_user_id"] = request.user.id
+
+    google_oauth_url = "https://accounts.google.com/o/oauth2/v2/auth"
+    params = {
+        "client_id": settings.GOOGLE_OAUTH_CLIENT_ID,
+        "redirect_uri": request.build_absolute_uri(reverse("users:google_callback")),
+        "scope": "openid email profile",
+        "response_type": "code",
+        "access_type": "offline",
+        "prompt": "select_account",
     }
-    return Response(data, status=status.HTTP_200_OK)
+    url = f"{google_oauth_url}?{urlencode(params)}"
+    return Response({"redirect_url": url}, status=200)
+
+def oauth_success(request):
+    return HttpResponse('<script>location.href="http://127.0.0.1:5500/home/home.html"</script>')
