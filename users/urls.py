@@ -26,13 +26,11 @@ urlpatterns = [
     path('profile/preview/', profile_preview_api, name="profile_preview"),
 
     #구글 OAuth
-    path("oauth/success/", oauth_success, name="oauth_success"),
     path('auth/google/', google_login, name='google_login'),
     path('auth/google/callback/', google_callback, name='google_callback'),
     path('auth/google/remove/', remove_google_auth, name='remove_google_auth'),
     path("csrf/", get_csrf_token, name="get_csrf_token"),
 
     path("csrf/", csrf_ping, name="csrf"),
-    path("users/csrf/", csrf, name="csrf"),
 
 ]

@@ -12,24 +12,21 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 
 import os
 from pathlib import Path
-from decouple import Config, RepositoryEnv, Csv
 from decouple import config
+from dotenv import load_dotenv
 
-
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-env = Config(RepositoryEnv(BASE_DIR / '.env'))
+
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = env('SECRET_KEY', default='dev-secret')
-DEBUG = env('DEBUG', default=True, cast=bool)
+SECRET_KEY = os.getenv('SECRET_KEY', config("SECRET_KEY", default="unsafe-secret"))
 
-SUPABASE_URL = env('SUPABASE_URL', default='')
-SUPABASE_ANON_KEY = env('SUPABASE_ANON_KEY', default='')
 # SECURITY WARNING: don't run with debug turned on in production!
 #DEBUG = False
 DEBUG = True
@@ -37,31 +34,12 @@ DEBUG = True
 #ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '*').split(',')
 
 ALLOWED_HOSTS = ["127.0.0.1", "localhost", "*"]
-SUPABASE_URL = env("SUPABASE_URL", default="")
-ALLOWED_HOSTS = env('ALLOWED_HOSTS', cast=Csv(), default='localhost,127.0.0.1')
-SUPABASE_ANON_KEY = env("SUPABASE_ANON_KEY", default="")
-
-
-ALLOWED_HOSTS = env('ALLOWED_HOSTS', default='127.0.0.1,localhost').split(',')
-
-SUPABASE_URL = env('SUPABASE_URL', default='')
-SUPABASE_ANON_KEY = env('SUPABASE_ANON_KEY', default='')
-
-CORS_ALLOWED_ORIGINS = [
-    "http://127.0.0.1:5500",
-    "http://localhost:5500",
-]
-CSRF_TRUSTED_ORIGINS = [
-    "http://127.0.0.1:5500",
-    "http://localhost:5500",
-]
 
 # Application definition
 
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
-    "django.contrib.sites",
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
@@ -78,8 +56,6 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.google',
     'corsheaders',
 ]
-SITE_ID = 1
-LOGIN_REDIRECT_URL = "/oauth/success/"
 
 AUTHENTICATION_BACKENDS = [
     'allauth.account.auth_backends.AuthenticationBackend',
@@ -188,7 +164,6 @@ AWS_ACCESS_KEY_ID = os.getenv('SUPABASE_SERVICE_KEY')
 AWS_SECRET_ACCESS_KEY = os.getenv('SUPABASE_SERVICE_KEY')
 AWS_STORAGE_BUCKET_NAME = os.getenv('SUPABASE_BUCKET_NAME')
 AWS_S3_ENDPOINT_URL = os.getenv('SUPABASE_URL') + '/storage/v1'
-AWS_S3_ENDPOINT_URL = f"{SUPABASE_URL.rstrip('/')}/storage/v1" if SUPABASE_URL else None
 AWS_QUERYSTRING_AUTH = False
 
 AUTH_USER_MODEL = 'users.User'
@@ -252,11 +227,6 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticated',
     ],
 }
-REST_FRAMEWORK = {
-    "DEFAULT_AUTHENTICATION_CLASSES": [
-        "rest_framework_simplejwt.authentication.JWTAuthentication",
-    ],
-}
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
@@ -286,16 +256,6 @@ CSRF_TRUSTED_ORIGINS = [
     "http://127.0.0.1:5173",
     "http://localhost:5173",
 ]
-from corsheaders.defaults import default_headers, default_methods
-CORS_ALLOW_HEADERS = list(default_headers) + ["x-csrftoken", "content-type"]
-CORS_ALLOW_METHODS = list(default_methods) + ["PUT", "PATCH", "DELETE"]
-
-# CSRF에서 신뢰할 오리진 (스킴 포함!)
-CSRF_TRUSTED_ORIGINS = [
-    "http://127.0.0.1:5500",
-    "http://localhost:5500",
-]
-
 
 #SESSION_COOKIE_SAMESITE = "None"
 #CSRF_COOKIE_SAMESITE = "None"

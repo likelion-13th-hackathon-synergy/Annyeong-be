@@ -25,7 +25,6 @@ urlpatterns = [
     path('api/match/', include('match.urls')),
     path('users/', include(('users.urls', 'users'), namespace='users')),
     path('reviews/', include('reviews.urls')),
-    path('accounts/', include('allauth.urls')),
 ]
 
 if settings.DEBUG:
