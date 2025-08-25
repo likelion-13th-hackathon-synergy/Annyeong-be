@@ -40,3 +40,4 @@ typing_extensions==4.14.1
 tzdata==2025.2
 urllib3==2.5.0
 zope.interface==7.2
+whitenoise==6.5.0
