@@ -228,7 +228,7 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 CORS_ALLOWED_ORIGINS = [
-    "https://annyeong-be.onrender.com", #백엔드 도메인
+    #"https://annyeong-be.onrender.com", #백엔드 도메인
     "https://annyeong-fe.onrender.com",
 
     #개발환경용
@@ -238,10 +238,33 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
 ]
 
+CORS_ALLOWED_HEADERS = [
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+]
+
+CORS_ALLOW_METHODS = [
+    'DELETE',
+    'GET',
+    'OPTIONS',
+    'PATCH',
+    'POST',
+    'PUT',
+]
+
+
 CORS_ALLOW_CREDENTIALS = True
 
 CSRF_TRUSTED_ORIGINS = [
     "https://annyeong-be.onrender.com",
+    "https://annyeong-fe.onrender.com",
 
     "http://127.0.0.1:5173",
     "http://localhost:5173",
