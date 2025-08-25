@@ -30,6 +30,16 @@ def get_csrf_token(request):
         "sessionid": request.session.session_key,
         "ok": True
     })
+    # CSRF 토큰을 쿠키에도 설정
+    response.set_cookie(
+        'csrftoken',
+        csrf_token,
+        max_age=None,
+        secure=True,  # HTTPS 환경
+        httponly=False,  # JavaScript에서 읽을 수 있도록
+        samesite='None'
+    )
+    return response
 
 class SignupView(APIView):
     permission_classes = [permissions.AllowAny]
