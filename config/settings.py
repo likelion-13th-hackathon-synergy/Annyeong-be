@@ -228,6 +228,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 CORS_ALLOWED_ORIGINS = [
     "https://annyeong-be.onrender.com", #백엔드 도메인
+    "https://annyeong-fe.onrender.com",
 
     #개발환경용
     "http://127.0.0.1:3000",
